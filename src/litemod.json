@@ -1,0 +1,10 @@
+{
+    "name" : "TNT Breadcrumbs",
+    "mcversion" : "1.8",
+    "author": "Its_its",
+    "description": "Yea",
+    "url": "ItsTJF.net",
+    "classTransformerClasses": [
+        "net.itstjf.cannoning.core.Transformer"
+    ]
+}
