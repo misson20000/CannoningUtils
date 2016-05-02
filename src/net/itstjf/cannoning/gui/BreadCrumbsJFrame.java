@@ -47,8 +47,7 @@ public class BreadCrumbsJFrame extends JFrame {
 	Settings settings = litemod.settings;
 	
 	private JLabel lblCrumbs = new JLabel("Crumbs: 0");
-	private DefaultListModel<String> listModel = new DefaultListModel<String>();
-	private JList<String> listSelections = new JList<String>(listModel);
+	private JList<String> listSelections = new JList<String>(new DefaultListModel<String>());
 	
 	private JButton btnRecordingButton;
 	private JSlider sliderRecording;
@@ -69,7 +68,7 @@ public class BreadCrumbsJFrame extends JFrame {
 		}
 		
 		this.setTitle("TNT Breadcrumbs | Its_its");
-		this.setResizable(false);
+		this.setResizable(true);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 760, 600);
 		
@@ -116,9 +115,7 @@ public class BreadCrumbsJFrame extends JFrame {
 		
 		this.updateSlider();
 		
-		for (BreadcrumbsTNT.UniqueEntity e : Reference.uniqueEntities) {
-			this.addToSelection(e);
-		}
+		this.updateSelections();
 	}
 	
 	private JPanel panelBreadCrumbs() {
@@ -211,8 +208,8 @@ public class BreadCrumbsJFrame extends JFrame {
 					
 					Reference.linesViewing = null;
 					Reference.uniqueEntities.remove(index);
-					listModel.remove(index);
-					setCrumbAmount(listModel.size());
+					((DefaultListModel)listSelections.getModel()).remove(index);
+					setCrumbAmount(((DefaultListModel)listSelections.getModel()).size());
 				}
 			}
 		});
@@ -238,10 +235,7 @@ public class BreadCrumbsJFrame extends JFrame {
 					true
 				};
 				
-				BreadCrumbsJFrame.this.removeAllCrumbs();
-				for (BreadcrumbsTNT.UniqueEntity e : Reference.uniqueEntities) {
-					BreadCrumbsJFrame.this.addToSelection(e);
-				}
+				BreadCrumbsJFrame.this.updateSelections();
 			}
 		});
 		
@@ -377,44 +371,44 @@ public class BreadCrumbsJFrame extends JFrame {
 		gbc_lblRendering.gridx = 0;
 		gbc_lblRendering.gridy = 11;
 		
-		this.rdbtnEnableRendering = new JRadioButton("Enabled");
-		rdbtnEnableRendering.setForeground(Color.LIGHT_GRAY);
-		rdbtnEnableRendering.setBackground(Color.DARK_GRAY);
-		this.rdbtnEnableRendering.addMouseListener(mtrListener);
-		this.rdbtnEnableRendering.setToolTipText("Render All TNT");
+		this.rdbtnRenderEnable = new JRadioButton("Enabled");
+		rdbtnRenderEnable.setForeground(Color.LIGHT_GRAY);
+		rdbtnRenderEnable.setBackground(Color.DARK_GRAY);
+		this.rdbtnRenderEnable.addMouseListener(mtrListener);
+		this.rdbtnRenderEnable.setToolTipText("Render All TNT");
 		GridBagConstraints gbc_5 = new GridBagConstraints();
 		gbc_5.insets = new Insets(0, 0, 5, 0);
 		gbc_5.anchor = GridBagConstraints.WEST;
 		gbc_5.gridx = 0;
 		gbc_5.gridy = 12;
 		
-		this.rdbtnRemoveFromEntityRendering = new JRadioButton("Remove from Entity List");
-		rdbtnRemoveFromEntityRendering.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveFromEntityRendering.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveFromEntityRendering.addMouseListener(mtrListener);
-		this.rdbtnRemoveFromEntityRendering.setToolTipText("Removes entities in the same block from entity list (Removes from crumbs)");
+		this.rdbtnRenderRemoveFromEntity = new JRadioButton("Remove from Entity List");
+		rdbtnRenderRemoveFromEntity.setForeground(Color.LIGHT_GRAY);
+		rdbtnRenderRemoveFromEntity.setBackground(Color.DARK_GRAY);
+		this.rdbtnRenderRemoveFromEntity.addMouseListener(mtrListener);
+		this.rdbtnRenderRemoveFromEntity.setToolTipText("Removes entities in the same block from entity list (Removes from crumbs)");
 		GridBagConstraints gbc_6 = new GridBagConstraints();
 		gbc_6.insets = new Insets(0, 0, 5, 0);
 		gbc_6.anchor = GridBagConstraints.WEST;
 		gbc_6.gridx = 0;
 		gbc_6.gridy = 13;
 		
-		this.rdbtnRemoveSameBlockRendering = new JRadioButton("Remove Rendering");
-		rdbtnRemoveSameBlockRendering.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveSameBlockRendering.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveSameBlockRendering.addMouseListener(mtrListener);
-		this.rdbtnRemoveSameBlockRendering.setToolTipText("Removes the rendering of tnt in the same block (Doesn't effect crumbs)");
+		this.rdbtnRenderRemoveSameBlock = new JRadioButton("Remove Rendering");
+		rdbtnRenderRemoveSameBlock.setForeground(Color.LIGHT_GRAY);
+		rdbtnRenderRemoveSameBlock.setBackground(Color.DARK_GRAY);
+		this.rdbtnRenderRemoveSameBlock.addMouseListener(mtrListener);
+		this.rdbtnRenderRemoveSameBlock.setToolTipText("Removes the rendering of tnt in the same block (Doesn't effect crumbs)");
 		GridBagConstraints gbc_7 = new GridBagConstraints();
 		gbc_7.insets = new Insets(0, 0, 5, 0);
 		gbc_7.anchor = GridBagConstraints.WEST;
 		gbc_7.gridx = 0;
 		gbc_7.gridy = 14;
 		
-		this.rdbtnRemoveAllRendering = new JRadioButton("Remove All Rendering");
-		rdbtnRemoveAllRendering.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveAllRendering.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveAllRendering.addMouseListener(mtrListener);
-		this.rdbtnRemoveAllRendering.setToolTipText("Removes the rendering of all tnt (Doesn't effect crumbs)");
+		this.rdbtnRenderRemoveAll = new JRadioButton("Remove All Rendering");
+		rdbtnRenderRemoveAll.setForeground(Color.LIGHT_GRAY);
+		rdbtnRenderRemoveAll.setBackground(Color.DARK_GRAY);
+		this.rdbtnRenderRemoveAll.addMouseListener(mtrListener);
+		this.rdbtnRenderRemoveAll.setToolTipText("Removes the rendering of all tnt (Doesn't effect crumbs)");
 		GridBagConstraints gbc_8 = new GridBagConstraints();
 		gbc_8.insets = new Insets(0, 0, 5, 0);
 		gbc_8.anchor = GridBagConstraints.WEST;
@@ -430,49 +424,61 @@ public class BreadCrumbsJFrame extends JFrame {
 		gbc_lblExplosions.gridx = 0;
 		gbc_lblExplosions.gridy = 16;
 		
-		this.rdbtnEnableExplosions = new JRadioButton("Enabled");
-		rdbtnEnableExplosions.setForeground(Color.LIGHT_GRAY);
-		rdbtnEnableExplosions.setBackground(Color.DARK_GRAY);
-		this.rdbtnEnableExplosions.addMouseListener(mteListener);
-		this.rdbtnEnableExplosions.setToolTipText("Render All Explosions");
-		this.rdbtnEnableExplosions.setSelected(true);
+		this.rdbtnExplosionEnable = new JRadioButton("Enabled");
+		rdbtnExplosionEnable.setForeground(Color.LIGHT_GRAY);
+		rdbtnExplosionEnable.setBackground(Color.DARK_GRAY);
+		this.rdbtnExplosionEnable.addMouseListener(mteListener);
+		this.rdbtnExplosionEnable.setToolTipText("Render All Explosions");
 		GridBagConstraints gbc_9 = new GridBagConstraints();
 		gbc_9.insets = new Insets(0, 0, 5, 0);
 		gbc_9.anchor = GridBagConstraints.WEST;
 		gbc_9.gridx = 0;
 		gbc_9.gridy = 17;
 		
-		this.rdbtnRemoveSameBlockExplosions = new JRadioButton("Remove Explosions");
-		rdbtnRemoveSameBlockExplosions.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveSameBlockExplosions.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveSameBlockExplosions.addMouseListener(mteListener);
-		this.rdbtnRemoveSameBlockExplosions.setToolTipText("Remove explosions in the same block");
+		this.rdbtnExplosionRemoveSameBlock = new JRadioButton("Remove Explosions");
+		rdbtnExplosionRemoveSameBlock.setForeground(Color.LIGHT_GRAY);
+		rdbtnExplosionRemoveSameBlock.setBackground(Color.DARK_GRAY);
+		this.rdbtnExplosionRemoveSameBlock.addMouseListener(mteListener);
+		this.rdbtnExplosionRemoveSameBlock.setToolTipText("Remove explosions in the same block");
 		GridBagConstraints gbc_10 = new GridBagConstraints();
 		gbc_10.insets = new Insets(0, 0, 5, 0);
 		gbc_10.anchor = GridBagConstraints.WEST;
 		gbc_10.gridx = 0;
 		gbc_10.gridy = 18;
 		
-		this.rdbtnRemoveNoVelocityExplosions = new JRadioButton("Remove No Velocity Explosions");
-		rdbtnRemoveNoVelocityExplosions.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveNoVelocityExplosions.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveNoVelocityExplosions.addMouseListener(mteListener);
-		this.rdbtnRemoveNoVelocityExplosions.setToolTipText("Remove explosions from tnt with no velocity");
+		this.rdbtnExplosionRemoveNoVelocity = new JRadioButton("Remove No Velocity Explosions");
+		rdbtnExplosionRemoveNoVelocity.setForeground(Color.LIGHT_GRAY);
+		rdbtnExplosionRemoveNoVelocity.setBackground(Color.DARK_GRAY);
+		this.rdbtnExplosionRemoveNoVelocity.addMouseListener(mteListener);
+		this.rdbtnExplosionRemoveNoVelocity.setToolTipText("Remove explosions from tnt with no velocity");
 		GridBagConstraints gbc_11 = new GridBagConstraints();
 		gbc_11.insets = new Insets(0, 0, 5, 0);
 		gbc_11.anchor = GridBagConstraints.WEST;
 		gbc_11.gridx = 0;
 		gbc_11.gridy = 19;
 		
-		this.rdbtnRemoveAllExplosions = new JRadioButton("Remove All Explosions");
-		rdbtnRemoveAllExplosions.setForeground(Color.LIGHT_GRAY);
-		rdbtnRemoveAllExplosions.setBackground(Color.DARK_GRAY);
-		this.rdbtnRemoveAllExplosions.addMouseListener(mteListener);
-		this.rdbtnRemoveAllExplosions.setToolTipText("Remove all explosions");
+		this.rdbtnExplosionRemoveAll = new JRadioButton("Remove All Explosions");
+		rdbtnExplosionRemoveAll.setForeground(Color.LIGHT_GRAY);
+		rdbtnExplosionRemoveAll.setBackground(Color.DARK_GRAY);
+		this.rdbtnExplosionRemoveAll.addMouseListener(mteListener);
+		this.rdbtnExplosionRemoveAll.setToolTipText("Remove all explosions");
 		GridBagConstraints gbc_rdbtnRemove = new GridBagConstraints();
 		gbc_rdbtnRemove.anchor = GridBagConstraints.WEST;
 		gbc_rdbtnRemove.gridx = 0;
 		gbc_rdbtnRemove.gridy = 20;
+		
+		ButtonGroup group1 = new ButtonGroup();
+		ButtonGroup group2 = new ButtonGroup();
+		
+		group1.add(this.rdbtnRenderEnable);
+		group1.add(this.rdbtnRenderRemoveFromEntity);
+		group1.add(this.rdbtnRenderRemoveSameBlock);
+		group1.add(this.rdbtnRenderRemoveAll);
+		
+		group2.add(this.rdbtnExplosionEnable);
+		group2.add(this.rdbtnExplosionRemoveSameBlock);
+		group2.add(this.rdbtnExplosionRemoveNoVelocity);
+		group2.add(this.rdbtnExplosionRemoveAll);
 		
 		//-- Set defaults
 		chckBxExplosion.setSelected(settings.blockExplosion);
@@ -483,23 +489,23 @@ public class BreadCrumbsJFrame extends JFrame {
 		chckbxDepth.setSelected(settings.depth);
 		
 		if (settings.tntRendering == Rendering.ENABLED) {
-			this.rdbtnEnableRendering.setEnabled(true);
+			this.rdbtnRenderEnable.setSelected(true);
 		} else if (settings.tntRendering == Rendering.REMOVE_ENTITY_LIST) {
-			this.rdbtnRemoveFromEntityRendering.setEnabled(true);
+			this.rdbtnRenderRemoveFromEntity.setSelected(true);
 		} else if (settings.tntRendering == Rendering.SAME_BLOCK_RENDERING) {
-			this.rdbtnRemoveSameBlockRendering.setEnabled(true);
+			this.rdbtnRenderRemoveSameBlock.setSelected(true);
 		} else if (settings.tntRendering == Rendering.ALL_RENDERING) {
-			this.rdbtnRemoveAllRendering.setEnabled(true);
+			this.rdbtnRenderRemoveAll.setSelected(true);
 		}
 		
 		if (settings.tntExplosions == Explosions.ENABLED) {
-			this.rdbtnEnableExplosions.setEnabled(true);
+			this.rdbtnExplosionEnable.setSelected(true);
 		} else if (settings.tntExplosions == Explosions.ALL_EXPLOSIONS) {
-			this.rdbtnRemoveAllExplosions.setEnabled(true);
+			this.rdbtnExplosionRemoveAll.setSelected(true);
 		} else if (settings.tntExplosions == Explosions.NO_VELOCITY) {
-			this.rdbtnRemoveNoVelocityExplosions.setEnabled(true);
+			this.rdbtnExplosionRemoveNoVelocity.setSelected(true);
 		} else if (settings.tntExplosions == Explosions.SAME_BLOCK_EXPLOSIONS) {
-			this.rdbtnRemoveSameBlockExplosions.setEnabled(true);
+			this.rdbtnExplosionRemoveSameBlock.setSelected(true);
 		}
 		
 		//-- Add to panel
@@ -516,27 +522,15 @@ public class BreadCrumbsJFrame extends JFrame {
 		panel.add(btnClearAllCrumbs, gbc_btnClearAllCrumbs);
 		panel.add(lblMinimalTNT, gbc_4);
 		panel.add(lblRendering, gbc_lblRendering);
-		panel.add(this.rdbtnEnableRendering, gbc_5);
-		panel.add(this.rdbtnRemoveFromEntityRendering, gbc_6);
-		panel.add(this.rdbtnRemoveSameBlockRendering, gbc_7);
-		panel.add(this.rdbtnRemoveAllRendering, gbc_8);
+		panel.add(this.rdbtnRenderEnable, gbc_5);
+		panel.add(this.rdbtnRenderRemoveFromEntity, gbc_6);
+		panel.add(this.rdbtnRenderRemoveSameBlock, gbc_7);
+		panel.add(this.rdbtnRenderRemoveAll, gbc_8);
 		panel.add(lblExplosions, gbc_lblExplosions);
-		panel.add(this.rdbtnEnableExplosions, gbc_9);
-		panel.add(this.rdbtnRemoveSameBlockExplosions, gbc_10);
-		panel.add(this.rdbtnRemoveNoVelocityExplosions, gbc_11);
-		panel.add(this.rdbtnRemoveAllExplosions, gbc_rdbtnRemove);
-		
-		ButtonGroup group1 = new ButtonGroup();
-		ButtonGroup group2 = new ButtonGroup();
-		
-		group1.add(this.rdbtnEnableRendering);
-		group1.add(this.rdbtnRemoveFromEntityRendering);
-		group1.add(this.rdbtnRemoveSameBlockRendering);
-		group1.add(this.rdbtnRemoveAllRendering);
-		group2.add(this.rdbtnEnableExplosions);
-		group2.add(this.rdbtnRemoveSameBlockExplosions);
-		group2.add(this.rdbtnRemoveNoVelocityExplosions);
-		group2.add(this.rdbtnRemoveAllExplosions);
+		panel.add(this.rdbtnExplosionEnable, gbc_9);
+		panel.add(this.rdbtnExplosionRemoveSameBlock, gbc_10);
+		panel.add(this.rdbtnExplosionRemoveNoVelocity, gbc_11);
+		panel.add(this.rdbtnExplosionRemoveAll, gbc_rdbtnRemove);
 		
 		//-- Mouse Listeners
 		
@@ -544,12 +538,14 @@ public class BreadCrumbsJFrame extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				int value = ((JSlider)e.getSource()).getValue();
 				settings.removalTime = value;
+				settings.save();
 			}
 		});
 		
 		spinnerLineWidth.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				settings.lineWidth = Integer.parseInt(String.valueOf(((JSpinner)e.getSource()).getValue()));
+				settings.save();
 			}
 		});
 		
@@ -557,6 +553,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				settings.isRenderingCrumbs = !((JCheckBox)e.getSource()).isSelected();
+				settings.save();
 			}
 		});
 		
@@ -564,6 +561,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				settings.blockExplosion = !((JCheckBox)e.getSource()).isSelected();
+				settings.save();
 			}
 		});
 		
@@ -571,6 +569,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				settings.enabled = !((JCheckBox)e.getSource()).isSelected();
+				settings.save();
 			}
 		});
 		
@@ -578,6 +577,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				settings.depth = !((JCheckBox)e.getSource()).isSelected();
+				settings.save();
 			}
 		});
 		
@@ -585,7 +585,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				BreadcrumbsTNT.removeCrumbs = true;
-				BreadCrumbsJFrame.this.listModel.clear();
+				((DefaultListModel)BreadCrumbsJFrame.this.listSelections.getModel()).clear();
 				BreadCrumbsJFrame.this.setCrumbAmount(0);
 			}
 		});
@@ -713,6 +713,7 @@ public class BreadCrumbsJFrame extends JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				settings.isRenderingRecording = !((JCheckBox)e.getSource()).isSelected();
+				settings.save();
 			}
 		});
 		
@@ -729,17 +730,21 @@ public class BreadCrumbsJFrame extends JFrame {
 		return panel;
 	}
 	
-	JRadioButton rdbtnEnableRendering, rdbtnRemoveFromEntityRendering, rdbtnRemoveSameBlockRendering, rdbtnRemoveAllRendering,
-			 rdbtnEnableExplosions, rdbtnRemoveSameBlockExplosions, rdbtnRemoveNoVelocityExplosions, rdbtnRemoveAllExplosions;
+	JRadioButton rdbtnRenderEnable, rdbtnRenderRemoveFromEntity, rdbtnRenderRemoveSameBlock, rdbtnRenderRemoveAll,
+			 rdbtnExplosionEnable, rdbtnExplosionRemoveSameBlock, rdbtnExplosionRemoveNoVelocity, rdbtnExplosionRemoveAll;
 	
-	public void addToSelection(BreadcrumbsTNT.UniqueEntity e) {
-		if(!e.canView()) return;
-		this.listModel.addElement(StringUtils.stripControlCodes(e.name));
-		this.setCrumbAmount(this.listModel.size());
+	public void updateSelections() {
+		DefaultListModel<String> listModel = new DefaultListModel<String>();
+		for(BreadcrumbsTNT.UniqueEntity e : Reference.uniqueEntities) {
+			if(!e.canView()) return;
+			listModel.addElement(StringUtils.stripControlCodes(e.name));
+		}
+		this.setCrumbAmount(listModel.size());
+		this.listSelections.setModel(listModel);
 	}
 	
 	public void removeAllCrumbs() {
-		this.listModel.clear();
+		((DefaultListModel)this.listSelections.getModel()).clear();
 		this.setCrumbAmount(0);
 	}
 	
@@ -755,13 +760,13 @@ public class BreadCrumbsJFrame extends JFrame {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			JRadioButton button = (JRadioButton)e.getSource();
-			if(button == BreadCrumbsJFrame.this.rdbtnEnableRendering) {
+			if(button == BreadCrumbsJFrame.this.rdbtnRenderEnable) {
 				settings.tntRendering = Rendering.ENABLED;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveFromEntityRendering) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnRenderRemoveFromEntity) {
 				settings.tntRendering = Rendering.REMOVE_ENTITY_LIST;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveSameBlockRendering) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnRenderRemoveSameBlock) {
 				settings.tntRendering = Rendering.SAME_BLOCK_RENDERING;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveAllRendering) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnRenderRemoveAll) {
 				settings.tntRendering = Rendering.ALL_RENDERING;
 			}
 		}
@@ -771,13 +776,13 @@ public class BreadCrumbsJFrame extends JFrame {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			JRadioButton button = (JRadioButton)e.getSource();
-			if(button == BreadCrumbsJFrame.this.rdbtnEnableExplosions) {
+			if(button == BreadCrumbsJFrame.this.rdbtnExplosionEnable) {
 				settings.tntExplosions = Explosions.ENABLED;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveSameBlockExplosions) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnExplosionRemoveSameBlock) {
 				settings.tntExplosions = Explosions.SAME_BLOCK_EXPLOSIONS;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveNoVelocityExplosions) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnExplosionRemoveNoVelocity) {
 				settings.tntExplosions = Explosions.NO_VELOCITY;
-			} else if(button == BreadCrumbsJFrame.this.rdbtnRemoveAllExplosions) {
+			} else if(button == BreadCrumbsJFrame.this.rdbtnExplosionRemoveAll) {
 				settings.tntExplosions = Explosions.ALL_EXPLOSIONS;
 			}
 		}

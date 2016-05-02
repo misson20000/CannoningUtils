@@ -32,6 +32,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.Vec3i;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -74,11 +75,7 @@ public class BreadcrumbsTNT {
 							double z = entity.prevPosZ - entity.posZ;
 							
 							if (x != 0.0D || y != 0.0D || z != 0.0D) {
-								Crumb crumb = new Crumb(
-										entity.posX, entity.posY + 0.49D, entity.posZ, 
-										System.nanoTime());
-								
-								entities[i].crumbs.add(crumb);
+								entities[i].addCrumb(entity.posX, entity.posY + 0.49D, entity.posZ);
 								this.lastEntity = System.currentTimeMillis() + 8000L;
 								this.entitiesSent = false;
 							}
@@ -88,9 +85,7 @@ public class BreadcrumbsTNT {
 					}
 					
 					if (!contained) {
-						UniqueEntity uniqueEntity = new UniqueEntity(entity);
-						uniqueEntity.crumbs.add(new Crumb(entity.posX, entity.posY, entity.posZ, System.nanoTime()));
-						Reference.uniqueEntities.add(uniqueEntity);
+						this.addUniqueEntity(entity);
 					}
 				}
 			}
@@ -98,26 +93,20 @@ public class BreadcrumbsTNT {
 		
 		if (System.currentTimeMillis() > this.lastEntity && !this.entitiesSent) {
 			if (this.litemod.jFrame != null) {
-				this.litemod.jFrame.removeAllCrumbs();
-				for (int i = 0; i < entities.length; i++) {
-					this.litemod.jFrame.addToSelection(entities[i]);
-				}
+				this.litemod.jFrame.updateSelections();
 			}
 			this.entitiesSent = true;
 		}
 		
-		if (settings.removalTime != 0 && entities.length != 0) {
+		if (this.settings.removalTime != 0 && entities.length != 0) {
 			for (int i = 0; i < entities.length; i++) {
 				if (entities[i].timeAdded < System.currentTimeMillis()) {
 					Reference.uniqueEntities.remove(entities[i]);
 				}
 			}
 			
-			if (litemod.jFrame != null) {
-				litemod.jFrame.removeAllCrumbs();
-				for (int i = 0; i < entities.length; i++) {
-					this.litemod.jFrame.addToSelection(entities[i]);
-				}
+			if (this.litemod.jFrame != null) {
+				this.litemod.jFrame.updateSelections();
 			}
 		}
 		
@@ -131,6 +120,13 @@ public class BreadcrumbsTNT {
 		
 		mc.fontRendererObj.drawString("Crumbs: " + (Reference.linesViewing == null ? Reference.uniqueEntities.size() : Reference.linesViewing.length + "/" + Reference.uniqueEntities.size()), 2, 2, 0xffffffff);
 		mc.fontRendererObj.drawString("Frames: " + Reference.recordings.size(), 2, 12, 0xffffffff);
+	}
+	
+	public UniqueEntity addUniqueEntity(Entity entity) {
+		UniqueEntity uniqueEntity = new UniqueEntity(entity);
+		uniqueEntity.crumbs.add(new Crumb(entity.posX, entity.posY, entity.posZ, System.nanoTime()));
+		Reference.uniqueEntities.add(uniqueEntity);
+		return uniqueEntity;
 	}
 	
 	private int removeCrumbs(UniqueEntity[] entities) {
@@ -168,7 +164,6 @@ public class BreadcrumbsTNT {
 				block.position.zCoord - Renderer.renderPosZ + 0.025);
 		GL11.glEnd();
 	}
-	
 	
 	private void drawEndX(UniqueEntity block) {
 		int endPos = block.crumbs.size() - 1;
@@ -274,8 +269,7 @@ public class BreadcrumbsTNT {
 		}
 	}
 	
-	
-	private final class Crumb {
+	public final class Crumb {
 		private final Vec3 position;
 		
 		private final long time;
@@ -285,7 +279,7 @@ public class BreadcrumbsTNT {
 			this.time = time;
 		}
 		
-		public Vec3 getX() {
+		public Vec3 getVec() {
 			return this.position;
 		}
 		
@@ -293,7 +287,6 @@ public class BreadcrumbsTNT {
 			return this.time;
 		}
 	}
-	
 	
 	public class UniqueEntity {
 		public List<Crumb> crumbs = new LinkedList<Crumb>();
@@ -345,6 +338,10 @@ public class BreadcrumbsTNT {
 			return false;
 		}
 		
+		public void addCrumb(double x, double y, double z) {
+			this.crumbs.add(new Crumb(x, y, z, System.nanoTime()));
+		}
+		
 		public void drawLines() {
 			if (this.id == 0) {
 				GL11.glColor4f(1, 0, 0, 1);
@@ -379,7 +376,6 @@ public class BreadcrumbsTNT {
 			return -1.0D;
 		}
 	}
-	
 	
 	public void onRender() {
 		if (!settings.enabled || !settings.isRenderingCrumbs) return;

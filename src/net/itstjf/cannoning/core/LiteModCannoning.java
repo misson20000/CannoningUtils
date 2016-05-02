@@ -1,13 +1,18 @@
 package net.itstjf.cannoning.core;
 
+import io.netty.buffer.Unpooled;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -16,11 +21,14 @@ import net.itstjf.cannoning.epum.Explosions;
 import net.itstjf.cannoning.epum.Rendering;
 import net.itstjf.cannoning.gui.BreadCrumbsJFrame;
 import net.itstjf.cannoning.mods.BreadcrumbsTNT;
+import net.itstjf.cannoning.mods.Projection;
 import net.itstjf.cannoning.mods.Recording;
 import net.itstjf.cannoning.render.Renderer;
+import net.itstjf.cannoning.utils.EntityDummyTNT;
 import net.itstjf.cannoning.utils.HashMapXYZ;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.settings.KeyBinding;
@@ -29,15 +37,23 @@ import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S27PacketExplosion;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.EntityRenderListener;
+import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.PacketHandler;
+import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.PostRenderListener;
 import com.mumfrey.liteloader.RenderListener;
 import com.mumfrey.liteloader.Tickable;
+import com.mumfrey.liteloader.core.ClientPluginChannels;
 import com.mumfrey.liteloader.core.LiteLoader;
+import com.mumfrey.liteloader.core.PluginChannels;
 import com.mumfrey.liteloader.transformers.event.EventInfo;
 import com.mumfrey.liteloader.transformers.event.ReturnEventInfo;
 
@@ -94,7 +110,7 @@ public class LiteModCannoning implements Tickable, PostRenderListener, PacketHan
 					}
 				});
 			} else {
-				if(this.jFrame.isVisible())
+				if (this.jFrame.isVisible())
 					this.jFrame.setVisible(false);
 				else this.jFrame.setVisible(true);
 			}
@@ -152,7 +168,7 @@ public class LiteModCannoning implements Tickable, PostRenderListener, PacketHan
 		mc.mcProfiler.endSection();
 	}
 	
-	@Override public String getVersion(){ return "BETA - 2016/04/21"; }
+	@Override public String getVersion(){ return "BETA - 2016/04/26"; }
 	@Override public String getName() 	{ return "Cannoning"; }
 	@Override public void onPostRender(float partialTicks) {}
 	@Override public void upgradeSettings(String version, File configPath, File oldConfigPath) {}
@@ -178,15 +194,15 @@ public class LiteModCannoning implements Tickable, PostRenderListener, PacketHan
 	@Override
 	public boolean handlePacket(INetHandler netHandler, Packet packet) {
 		if (settings.tntExplosions == Explosions.ENABLED) return true;
+		if (settings.tntExplosions == Explosions.ALL_EXPLOSIONS) return false;
 		
 		S27PacketExplosion exp = (S27PacketExplosion)packet;
 		
-		if (settings.tntExplosions == Explosions.ALL_EXPLOSIONS) return false;
 		if (settings.tntExplosions == Explosions.NO_VELOCITY) {
 			if (exp.func_149149_c() == 0.0F && exp.func_149144_d() == 0.0F && exp.func_149147_e() == 0.0F) {
 				return false;
 			}
-		}
+		} else
 		
 		if (settings.tntExplosions == Explosions.SAME_BLOCK_EXPLOSIONS) {
 			int xPos = (int)exp.func_149148_f();
