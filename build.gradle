@@ -1,0 +1,55 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
+
+version = "0.1"
+group = "net.itstfj.cannoning" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "cannoning"
+
+minecraft {
+    version = "1.8.9"
+    mappings = "stable_22"
+    runDir = "run"
+}
+
+sourceSets {
+    main {
+    }
+}
+
+mixin {
+    defaultObfuscationEnv notch
+}
+
+litemod {
+    json {
+        name = "test"
+        mcversion = "1.8.9"
+    }
+}
+
+jar {
+    from litemod.outputs
+}
