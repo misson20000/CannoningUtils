@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import com.mumfrey.liteloader.util.ObfuscationUtilities;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -20,7 +21,7 @@ public class PrivateFields<P, T> {
 	
 	protected PrivateFields(Class<P> owner, Obf obf) {
 		this.parentClass = owner;
-		this.fieldName = ModUtilities.getObfuscatedFieldName(obf);
+		this.fieldName = ObfuscationUtilities.getObfuscatedFieldName(obf);
 	}
 	
 	@SuppressWarnings("unchecked")

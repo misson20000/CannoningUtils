@@ -59,7 +59,7 @@ public class Projection {
 			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
 				for (int i = 0; i < this.shots.length; i++) {
 					Vec3 pos = this.shots[i].position;
-					if(shots.compareTo(pos) == 0) {
+					if(shots.getX() == pos.xCoord && shots.getY() == pos.yCoord && shots.getZ() == pos.zCoord) {
 						this.shots = ArrayUtils.remove(this.shots, i);
 						break returnz;
 					}

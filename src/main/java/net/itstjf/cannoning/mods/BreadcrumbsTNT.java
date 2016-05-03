@@ -306,7 +306,7 @@ public class BreadcrumbsTNT {
 			
 			if (this.entity instanceof EntityTNTPrimed) {
 				this.id = 0;
-				this.name = StringUtils.stripControlCodes(this.entity.getCommandSenderName());
+				this.name = StringUtils.stripControlCodes(this.entity.getCommandSenderEntity().getName());
 			} else if(this.entity instanceof EntityFallingBlock) {
 				EntityFallingBlock falling = (EntityFallingBlock)this.entity;
 				Block block = falling.getBlock().getBlock();

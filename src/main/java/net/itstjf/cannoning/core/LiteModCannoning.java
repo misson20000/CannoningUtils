@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,6 +57,8 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.core.PluginChannels;
 import com.mumfrey.liteloader.transformers.event.EventInfo;
 import com.mumfrey.liteloader.transformers.event.ReturnEventInfo;
+
+import static java.util.Arrays.asList;
 
 public class LiteModCannoning implements Tickable, PostRenderListener, PacketHandler {
 	public BreadcrumbsTNT moduleBreadcrumbs;
@@ -182,10 +185,10 @@ public class LiteModCannoning implements Tickable, PostRenderListener, PacketHan
 	}
 	
 	@Override
-	public List<Class<? extends Packet>> getHandledPackets() {
-		return ImmutableList.<Class<? extends Packet>>of(
-			S27PacketExplosion.class
-		);
+	public List<Class<? extends Packet<?>>> getHandledPackets() {
+		ArrayList<Class<? extends Packet<?>>> list = new ArrayList<Class<? extends Packet<?>>>(1);
+		list.add(S27PacketExplosion.class);
+		return list;
 	}
 	
 	long lastExplosion = 0;
@@ -205,9 +208,9 @@ public class LiteModCannoning implements Tickable, PostRenderListener, PacketHan
 		} else
 		
 		if (settings.tntExplosions == Explosions.SAME_BLOCK_EXPLOSIONS) {
-			int xPos = (int)exp.func_149148_f();
-			int yPos = (int)exp.func_149143_g();
-			int zPos = (int)exp.func_149145_h();
+			int xPos = (int)exp.getX();
+			int yPos = (int)exp.getY();
+			int zPos = (int)exp.getZ();
 			
 			lastExplosion = System.currentTimeMillis() + 6000;
 			
